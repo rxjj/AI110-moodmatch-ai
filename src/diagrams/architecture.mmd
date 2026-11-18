@@ -1,0 +1,23 @@
+
+flowchart TD
+    A["Four Example User Profiles"] --> B["main.py: Load Song Catalog"]
+    B --> C["agent.py: Build Playlist"]
+    C --> D["reliability.py: Validate Preferences"]
+    D --> E["recommender.py: Score and Rank Songs"]
+    E --> F["reliability.py: Filter Scores Below 2.0"]
+    F --> G["reliability.py: Evaluate Playlist"]
+
+    G --> H{"Enough Qualifying Songs?"}
+    H -->|Yes| K["Keep Original Playlist"]
+    H -->|No| I["Agent Explores Alternative Genres and Moods"]
+    I --> J["Score and Evaluate Alternatives"]
+    J --> K
+
+    K --> L["Final Reliability Verification"]
+    L --> M["Display Original Recommendations"]
+    L --> N["Display Quality Report"]
+    L --> O["Save Decisions to ai_interactions.md"]
+
+    P["Automated Tests: pytest"] -.-> D
+    P -.-> G
+    P -.-> J

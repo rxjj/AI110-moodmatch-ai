@@ -2,6 +2,8 @@ import csv
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 
+from .reliability import validate_preferences, filter_recommendations
+
 @dataclass
 class Song:
     """
@@ -82,10 +84,27 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     return score, reasons
 
 def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
-    """Return the top-k songs with scores and readable explanations."""
+    """Return top recommendations after reliability checks."""
+
+    # 1. Check that the user's preferences are valid.
+    validate_preferences(user_prefs, k)
+
+    # 2. Calculate a score for every song.
     recommendations = []
     for song in songs:
         score, reasons = score_song(user_prefs, song)
         recommendations.append((song, score, " ".join(reasons)))
 
-    return sorted(recommendations, key=lambda recommendation: recommendation[1], reverse=True)[:k]
+    # 3. Sort songs from highest score to lowest.
+    ranked = sorted(
+        recommendations,
+        key=lambda recommendation: recommendation[1],
+        reverse=True
+    )
+
+    # 4. Remove songs that score below 2.0.
+    reliable = filter_recommendations(ranked, threshold=2.0)
+
+    # 5. Return up to k qualifying songs.
+    return reliable[:k]
+

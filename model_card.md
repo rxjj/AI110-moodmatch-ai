@@ -1,83 +1,328 @@
-# 🎧 Model Card: Music Recommender Simulation
+# 🎧 Model Card: MoodMatch AI
 
-## Model Name
+## 1. Model Name
 
-**Vibe Match Music Recommender**
+**MoodMatch AI — Music Recommendation System**
 
----
+This project extends my original CodePath Module 3 Music Recommender Simulation.
 
-## Goal / Task
+## 2. Goal / Task
 
-Recommend the five songs in the catalog that best match a listener's favorite genre, favorite mood, and desired energy level.
+MoodMatch AI recommends songs based on a listener's favorite genre, favorite mood, and desired energy level.
 
----
+The system also checks recommendation quality and explores alternative preferences when the original playlist contains fewer than five qualifying songs.
 
-## Data Used
+The goal is to demonstrate how a recommendation system can combine content-based filtering, a rule-based agentic workflow, and reliability checks.
 
-The recommender uses a catalog of 18 songs. Each record includes genre, mood, energy, tempo, valence, danceability, and acousticness, but the scoring currently uses only genre, mood, and energy. There is no listener history or feedback data.
+## 3. Data Used
 
----
+The recommender uses a catalog of 18 songs.
 
-## Algorithm Summary
+Each song contains:
 
-This is a simple content-based recommender: it compares each song with one listener's preferences and sorts songs by score. A genre match adds 2 points, a mood match adds 1 point, and energy adds `1 - abs(song_energy - target_energy)` points (up to 1 when the values are on the 0-to-1 scale). The runner displays the five highest-scoring songs and explains the score.
+- Genre
+- Mood
+- Energy
+- Tempo
+- Valence
+- Danceability
+- Acousticness
 
----
+The scoring algorithm currently uses genre, mood, and energy.
 
-## Observed Behavior / Biases
+There is no real listener history, feedback, or user-rating data.
 
-Matching the requested genre and mood can produce sensible results, but the catalog has only 18 songs, so it offers limited variety and may lack good matches. The score ignores lyrics, artists, listening context, and several available song features; exact genre and mood labels may also miss listeners whose tastes do not fit those labels. Energy similarity rewards being close to one target, which may not represent a listener with mixed or changing preferences.
+## 4. Algorithm and System Design
 
-In the weight-shift experiment, genre changed from 2 points to 1, mood stayed at 1, and energy's contribution doubled. Scores changed, but the top-five rankings stayed the same for all four test profiles. This small experiment does not show which recommendations real listeners would prefer.
+### Original Recommendation Algorithm
 
----
+The original Module 3 system used content-based filtering.
 
-## Evaluation Process
+Each song receives:
 
-I tested four profiles and checked whether each list matched its preferred genre, mood, and energy. Here are the top five results in order:
+- +2.0 points for a matching genre.
+- +1.0 point for a matching mood.
+- Up to +1.0 point for energy similarity.
 
-- **High-Energy Pop:** Sunrise City, Gym Hero, Rooftop Lights, Paper Lantern Dance, Saturday Parade. Sunrise City leads because it matches pop and happy and is close to the high-energy target.
-- **Chill Lofi:** Midnight Coding, Library Rain, Focus Flow, Spacewalk Thoughts, Wildflower Map. The first two match both lofi and chill; Focus Flow is also lofi and has almost exactly the target energy, though its mood is focused rather than chill.
-- **Deep Intense Rock:** Storm Runner, Gym Hero, Comet Trail, Paper Lantern Dance, Sunrise City. Storm Runner matches rock and intense and is close to the high-energy target.
-- **High-Energy Melancholic Blues:** Blue Hour Train, Comet Trail, Gym Hero, Storm Runner, Paper Lantern Dance. Blue Hour Train matches blues and melancholic, so it ranks first even though its energy similarity is only 0.51. Its genre and mood matches outweigh the energy gap; the other songs near the top have energy closer to the target but match neither preferred label.
+Energy similarity is calculated using:
 
-Gym Hero is a notable surprise because it appears for both Pop and Rock. It matches the Pop profile's genre and has high energy, while for Rock it matches the intense mood and has high energy; it does not need to match every preference to rank well. The blues result is also a reminder that a top rank means “highest score under these rules,” not necessarily a perfect fit for everything the listener asked for.
+`1 - abs(song_energy - target_energy)`
 
-The six pairwise comparisons show which profiles have similar results and why:
+Songs are ranked from highest to lowest score.
 
-1. **High-Energy Pop vs. Chill Lofi:** Their top-five lists do not overlap. The Pop list favors happy pop and high-energy tracks; the Lofi list favors lofi/chill songs near the lower energy target.
-2. **High-Energy Pop vs. Deep Intense Rock:** They share Gym Hero. It is pop and energetic, helping it for Pop, and it is intense and energetic, helping it for Rock. The remaining songs differ because the profiles favor different genres and moods.
-3. **High-Energy Pop vs. High-Energy Melancholic Blues:** They share Gym Hero and Paper Lantern Dance. Both lists favor energetic songs, but Pop also rewards happy/pop matches while Blues rewards melancholic/blues matches, putting Sunrise City first for Pop and Blue Hour Train first for Blues.
-4. **Chill Lofi vs. Deep Intense Rock:** Their top-five lists do not overlap. Their energy targets are far apart, and their preferred genres and moods—lofi/chill versus rock/intense—are different.
-5. **Chill Lofi vs. High-Energy Melancholic Blues:** Their top-five lists do not overlap. The Lofi profile favors low-energy chill tracks, while the Blues profile favors melancholic blues and asks for high energy, so the two lists reflect different moods, genres, and energy targets.
-6. **Deep Intense Rock vs. High-Energy Melancholic Blues:** They share Comet Trail, Gym Hero, Storm Runner, and Paper Lantern Dance. Both profiles target high energy, so energetic songs can score well for both. Storm Runner leads for Rock because it matches rock and intense; Blue Hour Train leads for Blues because it matches blues and melancholic despite lower energy.
+### Project 4 — Option 4: Reliability System
 
-I also compared the original weights (genre match = 2 points, mood match = 1, energy similarity = 1 times its similarity) with the experiment (genre = 1, mood = 1, energy = 2 times its similarity). The scores changed, but the top-five rankings stayed in the same order for all four profiles. This small test shows the weight change affected score values but did not change these lists; it does not establish which lists real listeners would prefer.
+I added a reliability system that:
 
----
+1. Validates user preferences.
+2. Rejects invalid input values.
+3. Filters recommendations scoring below 2.0.
+4. Evaluates recommendation quality.
+5. Supports automated testing.
 
-## Intended Use and Non-Intended Use
+This prevents the recommender from filling a playlist with songs that do not meet the minimum scoring requirement.
 
-This project is for classroom exploration of how simple recommendation scores work. It can demonstrate how genre, mood, and energy affect a short list, but it is not intended as a production music service or as a reliable measure of an individual listener's taste.
+### Project 4 — Option 2: Agentic Workflow
 
----
+I also added a rule-based agent that:
 
-## Ideas for Improvement
+1. Generates an original playlist.
+2. Checks the number of qualifying songs.
+3. Detects when fewer than five songs qualify.
+4. Explores alternative genre and mood combinations.
+5. Compares the number of qualifying recommendations.
+6. Identifies an alternative when one produces more qualifying songs.
+7. Preserves the original user preferences.
+8. Records its decisions.
 
-- Expand the catalog with more songs and a wider range of genres, moods, and energy levels.
-- Let listeners rate recommendations, then use that feedback to check whether the results match their tastes.
-- Ask for preferences such as tempo or acousticness and use them in scoring, while checking that the top results remain varied.
+The agent does not use a large language model. It follows a deterministic decision-making workflow.
 
----
+An alternative with more qualifying songs is not necessarily a better match for the listener's original preferences.
 
-## 9. Personal Reflection
+## 5. Observed Behavior and Limitations
 
-Working on this project helped me understand how music recommendation systems work and how they use different preferences to suggest songs. Before this project, I didn't really think about how much the scoring system matters. I learned that even a simple algorithm can make recommendations by comparing things like genre, mood, and energy.
+The system generally prioritizes songs matching the listener's genre and mood.
 
-One thing that surprised me was how changing the scoring weights didn't change the order of the recommendations. I also found it interesting that Blue Hour Train ranked first even though its energy didn't really match what the listener wanted. That showed me that just because a song has the highest score doesn't mean it's the perfect recommendation.
+However, several limitations remain.
 
-Using AI tools like GitHub Copilot helped me understand the code, fix issues, and test different ideas. However, I also learned that I shouldn't just trust everything AI gives me. I had to check the results in the terminal, run tests, and make sure the calculations and recommendations made sense.
+### Small Dataset
 
-This project also changed how I look at music recommendation apps. I realized that recommendations aren't always as complicated as they seem, but the way a system is designed can affect what people see. If I continued this project, I would add more songs, allow users to give feedback, and include more preferences to make the recommendations better.
+The catalog contains only 18 songs.
 
-Overall, this was a good learning experience because I got to see how coding, AI tools, and testing work together to build a recommendation system.
+Some profiles have very few songs that meet the quality threshold.
+
+### Fixed Scoring Rules
+
+Genre, mood, and energy use predefined weights.
+
+The system does not learn from listener behavior.
+
+### Exact Matching
+
+Genre and mood must match exactly.
+
+This may exclude songs that are similar but use different labels.
+
+### Agent Limitations
+
+The agent searches alternative genre and mood combinations to find more qualifying songs.
+
+However, it does not currently measure whether those alternatives are similar to the original preferences.
+
+For example, a happy pop listener may receive a suggestion involving adventurous lofi.
+
+That alternative produces more qualifying songs but may not match the listener's intended musical style.
+
+### Reliability Limitations
+
+A score of 2.0 or higher indicates that a song passes the project's scoring threshold.
+
+It does not prove that a listener will enjoy the song.
+
+The quality pass rate measures threshold compliance, not real-world recommendation accuracy.
+
+## 6. Evaluation Process
+
+I evaluated the system using four example profiles.
+
+### High-Energy Pop
+
+Input:
+
+- Genre: pop
+- Mood: happy
+- Target energy: 0.85
+
+Results:
+
+- Sunrise City — 3.97
+- Gym Hero — 2.92
+
+Two songs met the quality threshold.
+
+The agent identified an alternative preference combination with three qualifying songs.
+
+### Chill Lofi
+
+Input:
+
+- Genre: lofi
+- Mood: chill
+- Target energy: 0.4
+
+Results:
+
+- Midnight Coding — 3.98
+- Library Rain — 3.95
+- Focus Flow — 3.00
+
+Three songs met the quality threshold.
+
+### Deep Intense Rock
+
+Input:
+
+- Genre: rock
+- Mood: intense
+- Target energy: 0.95
+
+Result:
+
+- Storm Runner — 3.96
+
+One song met the quality threshold.
+
+### High-Energy Melancholic Blues
+
+Input:
+
+- Genre: blues
+- Mood: melancholic
+- Target energy: 0.95
+
+Result:
+
+- Blue Hour Train — 3.51
+
+One song met the quality threshold.
+
+This demonstrates that matching genre and mood can outweigh a weaker energy match.
+
+## 7. Reliability Testing
+
+The project uses pytest to test the recommender, reliability system, and agent workflow.
+
+The latest local test run produced:
+
+```text
+15 passed in 0.10s
+```
+
+The tests verify:
+
+- Recommendation generation
+- Input validation
+- Invalid energy rejection
+- Quality filtering
+- Evaluation reports
+- Agent alternative exploration
+- Preservation of original preferences
+- Final reliability verification
+
+The main application also generates quality reports and saves agent decisions in `ai_interactions.md`.
+
+## 8. Responsible AI Considerations
+
+### Potential Misuse
+
+MoodMatch AI could be misused if someone presents its recommendations as guaranteed to match a listener's tastes.
+
+Because the system uses only 18 songs and fixed scoring rules, its recommendations may not reflect what someone actually enjoys.
+
+Another risk is that the agent could suggest alternative genres or moods that are different from the listener's original preferences.
+
+### Prevention and Safeguards
+
+To reduce these risks, I implemented several safeguards:
+
+- Input validation rejects invalid preferences.
+- Recommendation filtering removes songs scoring below 2.0.
+- Song scores and explanations make recommendations more transparent.
+- The agent preserves the listener's original preferences.
+- Agent decisions are recorded in `ai_interactions.md`.
+- Automated tests help verify expected behavior.
+
+These safeguards improve reliability and transparency, but they do not guarantee that listeners will enjoy the recommendations.
+
+### Responsible Use
+
+MoodMatch AI is intended for educational purposes, not as a production music recommendation service.
+
+The quality pass rate measures how many songs meet the scoring threshold. It does not measure real listener satisfaction.
+
+## 9. Personal Reflection and AI Collaboration
+
+### What I Learned
+
+Working on this project helped me understand how recommendation systems work and how design decisions affect the results.
+
+In my original Module 3 project, I learned how genre, mood, and energy could be combined into a scoring system.
+
+For Project 4, I learned that generating recommendations is only one part of building a reliable system.
+
+I also needed to validate inputs, filter weak results, evaluate outputs, and test whether the agent's decisions actually improved anything.
+
+### How I Used AI During Development
+
+I used AI assistance, including GitHub Copilot and ChatGPT, to understand Python code, discuss system design, troubleshoot errors, and develop testing ideas.
+
+I did not treat AI-generated suggestions as automatically correct.
+
+I ran the application in VS Code, examined the terminal output, and used pytest to verify that the implementation behaved as expected.
+
+### An AI Suggestion I Accepted
+
+One suggestion I accepted was adding a reliability system to the recommender.
+
+The reliability system validates user preferences and filters songs that score below 2.0.
+
+I accepted this approach because the original system always returned five songs, even when some songs were weak matches.
+
+After implementing the reliability checks, the application returned only songs meeting the threshold.
+
+This made the recommendation criteria more consistent and transparent.
+
+### An AI Suggestion I Revised
+
+During development, the initial agent workflow explored alternative moods when the original playlist was too short.
+
+However, testing showed that changing only the mood did not increase the number of qualifying songs for the pop profile.
+
+Instead of assuming the agent was working correctly simply because the code ran, I checked its actual output.
+
+I revised the workflow to explore both genres and moods.
+
+After the revision, the agent identified an alternative combination with three qualifying songs instead of two.
+
+This taught me that AI suggestions should be evaluated based on observable results, not just whether the code executes successfully.
+
+I also recognized that finding more songs under different preferences does not automatically mean the recommendations are more relevant.
+
+### What Surprised Me
+
+One thing that surprised me in the original project was that changing the scoring weights did not change the top-five rankings for the four profiles.
+
+Another interesting result was Blue Hour Train ranking first for the blues profile despite having a relatively weak energy match.
+
+In Project 4, I was surprised that an agent could execute several decision-making steps and still fail to find an improvement.
+
+That experience showed me why evaluation and testing are important.
+
+### Limitations and Future Improvements
+
+The project still uses a small dataset and fixed scoring rules.
+
+The agent does not measure how closely alternative preferences resemble the listener's original request.
+
+If I continued developing MoodMatch AI, I would:
+
+- Expand the music catalog.
+- Add listener feedback and ratings.
+- Use additional song attributes.
+- Improve alternative recommendations by measuring preference similarity.
+- Build an interactive interface.
+- Test recommendations with real listeners.
+
+### Final Reflection
+
+Overall, this project helped me understand how coding, AI-assisted development, and testing work together.
+
+I learned that a system should not simply produce an output. It should also explain its decisions, handle invalid inputs, and provide evidence that its behavior matches the intended design.
+
+The biggest lesson I learned is that AI can help me develop ideas and solve problems, but I still need to understand, test, and evaluate the results myself.
+
+## 10. Intended Use and Non-Intended Use
+
+MoodMatch AI is intended for educational demonstrations of recommendation algorithms, reliability checks, and rule-based decision workflows.
+
+It is not intended to replace a commercial music recommendation service or predict listener satisfaction accurately.

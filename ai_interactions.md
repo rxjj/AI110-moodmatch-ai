@@ -1,43 +1,42 @@
-# AI Interactions Log
+# MoodMatch AI — Agent Decision Logs
 
-> **Stretch features only.** Only fill in the sections that apply to stretch features you attempted. If you did not attempt a stretch feature, leave its section blank or delete it. This file is not required for the core project.
+These logs record the agent's decision steps.
+The workflow uses rule-based decisions, not an LLM.
 
----
+## High-Energy Pop
 
-## Agentic Workflow (SF8)
+- Original playlist: 2 of 5 songs.
+- Quality check: 2 of 2 songs passed.
+- Playlist is short. Exploring alternative genres and moods.
+- Better alternative found: genre='lofi', mood='adventurous'.
+- Alternative playlist: 3 of 5 songs.
+- Original preferences remain unchanged.
+- Final verification: 2 of 2 songs passed.
 
-> Document your experience using an AI agent (e.g., Cursor Agent, Claude, Copilot) to make multi-step changes autonomously.
+## Chill Lofi
 
-**What task did you give the agent?**
+- Original playlist: 3 of 5 songs.
+- Quality check: 3 of 3 songs passed.
+- Playlist is short. Exploring alternative genres and moods.
+- No alternative improved the playlist.
+- Final verification: 3 of 3 songs passed.
 
-<!-- Describe the goal you asked the agent to accomplish -->
+## Deep Intense Rock
 
-**Prompts used:**
+- Original playlist: 1 of 5 songs.
+- Quality check: 1 of 1 songs passed.
+- Playlist is short. Exploring alternative genres and moods.
+- Better alternative found: genre='lofi', mood='adventurous'.
+- Alternative playlist: 3 of 5 songs.
+- Original preferences remain unchanged.
+- Final verification: 1 of 1 songs passed.
 
-<!-- Paste the key prompts you gave the agent -->
+## High-Energy Melancholic Blues (Edge Case)
 
-**What did the agent generate or change?**
-
-<!-- List the files edited, code generated, or commands run -->
-
-**What did you verify or fix manually?**
-
-<!-- Describe anything the agent got wrong or that required human review -->
-
----
-
-## Design Pattern (SF10)
-
-> Document how AI helped you choose or implement a design pattern.
-
-**Which design pattern did you use?**
-
-<!-- e.g., Strategy, Factory, Observer, etc. -->
-
-**How did AI help you brainstorm or implement it?**
-
-<!-- Describe the conversation or suggestions that led to your decision -->
-
-**How does the pattern appear in your final code?**
-
-<!-- Point to the relevant class or method -->
+- Original playlist: 1 of 5 songs.
+- Quality check: 1 of 1 songs passed.
+- Playlist is short. Exploring alternative genres and moods.
+- Better alternative found: genre='lofi', mood='adventurous'.
+- Alternative playlist: 3 of 5 songs.
+- Original preferences remain unchanged.
+- Final verification: 1 of 1 songs passed.
